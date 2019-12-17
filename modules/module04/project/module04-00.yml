@@ -1,0 +1,20 @@
+#Setup AviComponents for TShoot Tasks
+avi_config:
+  serviceenginegroup:
+      -
+          vcpus_per_se: 1
+          se_name_prefix: saseg01
+          max_vs_per_se: 12
+          max_scaleout_per_vs: 2
+          vcenter_folder: AviSeFolder
+          dedicated_dispatcher_core: false
+          min_scaleout_per_vs: 2
+          name: Default-Group
+          buffer_se: 0
+          mem_reserve: false
+          max_se: 2
+          memory_per_se: 2048
+          algo: PLACEMENT_ALGO_PACKED
+          tenant_ref: /api/tenant/?name=admin
+          tenant: admin
+          cloud_ref: '/api/cloud/?name=Default-Cloud'

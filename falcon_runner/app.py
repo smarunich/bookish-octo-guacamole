@@ -1,8 +1,11 @@
 import falcon
-from .runner import AnsibleRunner
+from runner import AnsibleRunner
+from runner import Index
 
 api = application = falcon.API()
 
 runner = AnsibleRunner()
-api.add_route('/runner', runner)
+index = Index()
+
+api.add_route('/', index)
 api.add_route('/runner/{run}', runner)

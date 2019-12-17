@@ -1,0 +1,115 @@
+avi_config:
+  pool:
+      -   lb_algorithm: LB_ALGORITHM_ROUND_ROBIN
+          default_server_port: 30002
+          servers:
+              - 
+                  hostname: sa-server-01
+                  ratio: 1
+                  ip:
+                      type: V4
+                      addr: 172.20.130.101
+                  enabled: true
+              - 
+                  hostname: sa-server-03
+                  ratio: 1
+                  ip:
+                      type: V4
+                      addr: 172.20.130.103
+                  enabled: true
+                  port: 81
+              - 
+                  hostname: sa-server-02
+                  ratio: 1
+                  ip:
+                      type: V4
+                      addr: 172.20.130.102
+                  enabled: true
+                  port: 81
+          tenant_ref: /api/tenant/?name=module04-07
+          tenant: module04-07
+          cloud_ref: '/api/cloud/?name=Default-Cloud'
+          vrf_ref: '/api/vrfcontext/?name=global'
+          name: module04-07-pool
+          enabled: true
+  vsvip:
+      - 
+          dns_info:
+              - 
+                  num_records_in_response: 1
+                  type: DNS_RECORD_A
+                  fqdn: module04-07.sa.vclass.local
+                  algorithm: DNS_RECORD_RESPONSE_CONSISTENT_HASH
+                  ttl: 30
+          tenant_ref: /api/tenant/?name=module04-07
+          tenant: module04-07
+          cloud_ref: '/api/cloud/?name=Default-Cloud'
+          vip:
+              - 
+                  auto_allocate_ip: true
+                  vip_id: '1'
+                  avi_allocated_fip: false
+                  discovered_networks:
+                      - 
+                          subnet:
+                              - 
+                                  mask: 24
+                                  ip_addr:
+                                      type: V4
+                                      addr: 172.20.120.0
+                          network_ref: '/api/network/?name=pg-SA-VIP'
+                  enabled: true
+                  ipam_network_subnet:
+                      subnet:
+                          mask: 24
+                          ip_addr:
+                              type: V4
+                              addr: 172.20.120.0
+                  auto_allocate_floating_ip: false
+                  avi_allocated_vip: false
+                  auto_allocate_ip_type: V4_ONLY
+          vrf_context_ref: '/api/vrfcontext/?name=global'
+          name: vsvip-module04-07-Default-Cloud
+  tenant:
+      - 
+          name: module04-07
+          config_settings:
+              se_in_provider_context: true
+              tenant_access_to_provider_se: true
+              tenant_vrf: false
+  virtualservice:
+      - 
+          network_profile_ref: '/api/networkprofile/?name=System-TCP-Proxy'
+          tenant_ref: /api/tenant/?name=module04-07
+          tenant: module04-07
+          remove_listening_port_on_vs_down: false
+          delay_fairness: false
+          vrf_context_ref: '/api/vrfcontext/?name=global'
+          analytics_profile_ref: '/api/analyticsprofile/?name=System-Analytics-Profile'
+          cloud_ref: '/api/cloud/?name=Default-Cloud'
+          se_group_ref: '/api/serviceenginegroup/?name=Default-Group'
+          vsvip_ref: '/api/vsvip/?name=vsvip-module04-07-Default-Cloud'
+          application_profile_ref: '/api/applicationprofile/?name=System-HTTP'
+          services:
+              - 
+                  enable_ssl: false
+                  port_range_end: 80
+                  port: 80
+          pool_ref: '/api/pool/?name=module04-07-pool'
+          name: module04-07
+          enable_autogw: true
+          enabled: true
+          close_client_conn_on_config_update: false
+          analytics_policy:
+              udf_log_throttle: 10
+              full_client_logs:
+                  duration: 0
+                  throttle: 10
+                  enabled: true
+              metrics_realtime_update:
+                  duration: 0
+                  enabled: true
+              significant_log_throttle: 10
+              client_insights: NO_INSIGHTS
+              all_headers: true
+          flow_label_type: NO_LABEL

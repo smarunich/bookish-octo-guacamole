@@ -1,0 +1,89 @@
+<html>
+<head>
+<style>
+ul {
+    list-style-type: none;
+    margin: 0;
+    padding: 0;
+}
+
+li a {
+    width: 60px;
+    font: bold 12px arial, sans-serif;
+    color: white;
+}
+</style>
+</head>
+  <body style="background-color:#006e90;color:white">
+    <br>
+    <div align="center">
+    <h2> Welcome to Module Switcher </h2>
+    <form>
+    <table id="tabl">
+      <tr>
+      </tr>
+    {% block content %}
+    {% for module in modules %}
+           <tr>
+              </tr>
+              <tr>
+              </tr>
+     <tr>
+        <td  ><font size=4> {{module}} </font></td>
+        <td></td>
+        <td><button type="button" onclick="reply_click('{{module}}')" id="{{module}}">
+        Run</button></td>
+        <td></td>
+        <td id="scl" ></th>
+    {% endfor %}
+          </tr>
+{% endblock %}
+    </table>
+        <br>
+        <div align="center">
+          <h2 > Status  </h2>
+          <br>
+        <table>
+
+          <tr >
+                      <div align="center">
+                        <pre id="status_head"></pre>
+                      </div>
+           <div align="left">
+            <pre  id="status_body"></pre>
+          </div>
+          </tr>
+        </table>
+    </form>
+    </div>
+    <script src="https://ajax.googleapis.com/ajax/libs/jquery/1.12.4/jquery.min.js"></script>
+    <script>
+
+        function reply_click(id)
+        {
+            document.getElementById('status_head').innerHTML = 'Loading';
+            $("#"+id).prop("disabled", true);
+            $.ajax({
+              type: 'GET',
+              url: '/runner/' + id + '?playbook=main.yml',
+              contentType: "application/json",
+              dataType: "json",
+              cache: false,
+              success: function (data) {
+                alert(id + " has been succesfully provisioned!  ");
+                document.getElementById('status_head').innerHTML = 'Success!';
+                document.getElementById('status_body').innerHTML = JSON.stringify(data, null, 4);
+              },
+              error: function (data) {
+                alert(id + " provisioning has failed! ");
+                document.getElementById('status_head').innerHTML = 'Failure!';
+                document.getElementById('status_body').innerHTML = JSON.stringify(data, null, 4);
+                $("#" + id).prop("disabled", false);
+              },
+              timeout: 200000
+            });
+            return false;
+          }
+</script>
+</body>
+</html>

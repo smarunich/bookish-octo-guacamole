@@ -1,0 +1,45 @@
+---
+- connection: local
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+  - ../vars/shared_vars.yml
+  tasks:
+  - name: Setup module04
+    include_role:
+      name: avinetworks.aviconfig
+    vars:
+      avi_config_file: "{{ module_name }}"
+    loop:
+      - "module04-00.yml"
+      - "module04-01.yml"
+      - "module04-02.yml"
+      - "module04-03.yml"
+      - "module04-04.yml"
+      - "module04-05.yml"
+      - "module04-06.yml"
+      - "module04-07.yml"
+      - "module04-08.yml"
+      - "module04-09.yml"
+      - "module04-10.yml"
+      - "module04-11.yml"
+      - "module04-12.yml"
+    loop_control:
+      loop_var: module_name
+  - name: Add host to known_hosts file
+    local_action: "shell ssh-keyscan SA-AVITOOLS-01 >> ~/.ssh/known_hosts"
+  - add_host:
+      hostname: SA-AVITOOLS-01
+    name: Add host to in-memory inventory
+
+#Configure avitools jumpbox env
+- hosts: SA-AVITOOLS-01
+  vars:
+    ansible_ssh_pass: "VMware1!"
+    ansible_ssh_user: aviadmin
+  tasks:
+  - name: update profile
+    lineinfile:
+      dest: ~/.profile
+      state: present
+      line: 'export LARGEHEADER="X-SAML-Attribs: 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"'
