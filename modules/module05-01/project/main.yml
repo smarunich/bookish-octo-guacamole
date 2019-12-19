@@ -1,0 +1,13 @@
+---
+- connection: local
+  hosts: localhost
+  gather_facts: false
+  vars_files:
+  - ../vars/shared_vars.yml
+  tasks:
+  - name: Clean up tasks
+    include: module05-00.yml
+    tags:
+    - always
+  - name: Deploy module05-06
+    include: module05-01.yml

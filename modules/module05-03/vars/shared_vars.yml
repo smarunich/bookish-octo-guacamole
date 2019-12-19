@@ -1,0 +1,16 @@
+avi_controller: sa-avicon-01.vclass.local
+avi_username: admin
+avi_password: VMware1!
+api_version: 18.2.6
+
+avi_credentials:
+  controller: sa-avicon-01.vclass.local
+  username: admin
+  password: VMware1!
+  api_version: 18.2.6
+
+vmware:
+  hostname: "sa-vcsa-01.vclass.local"
+  username: "administrator@vsphere.local"
+  password: "VMware1!"
+  datacenter: "SA-Datacenter"

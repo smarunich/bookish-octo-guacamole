@@ -1,0 +1,23 @@
+- avi_cloudconnectoruser:
+    avi_credentials: "{{ avi_credentials }}"
+    tenant: admin
+    tenant_ref: /api/tenant?name=admin
+    name: aviuser
+  name: Create CC User Module05-08
+- avi_cloud:
+    avi_credentials: "{{ avi_credentials }}"
+    name: LinuxServerCloud
+    vtype: CLOUD_LINUXSERVER
+    tenant_ref: '/api/tenant/?name=admin'
+    linuxserver_configuration:
+      ssh_user_ref: "/api/cloudconnectoruser/?name=aviuser"
+      hosts:
+        - host_attr:
+          - attr_key: "DPDK"
+            attr_val: "No"
+          - attr_key: "SE_INBAND_MGMT"
+            attr_val: "False"
+          host_ip:
+            type: V4
+            addr: 172.20.130.104
+  name: Create LSC Module05-08

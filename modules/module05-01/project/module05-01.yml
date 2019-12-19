@@ -1,0 +1,52 @@
+- avi_api_session:
+      avi_credentials: "{{ avi_credentials }}"
+      http_method: get
+      path: network-inventory
+      params:
+        name: pg-SA-VIP
+  register: network_runtime_collection
+  name: Collect Network Info Module05-01
+- set_fact:
+    used_ips: "{{ network_runtime_collection['obj']['results'][0]['runtime']['subnet_runtime'][0]['used_ip_count'] }}"
+  name: Build fact for Module05-01
+- set_fact:
+    ip_var: "{{ '172.20.120.90' | ipmath(used_ips|int - 1) }}"
+  name: Set IP last IP in range Module05-01 
+- name: Update subnet range Module05-01
+  avi_network:
+      avi_api_patch_op: replace
+      avi_api_update_method: patch
+      name: pg-SA-VIP
+      avi_credentials: "{{ avi_credentials }}"
+      configured_subnets:
+          - 
+              prefix:
+                  ip_addr:
+                      type: V4
+                      addr: 172.20.120.0
+                  mask: 24
+              static_ranges:
+                  - 
+                      begin:
+                          type: V4
+                          addr: 172.20.120.90
+                      end:
+                          type: V4
+                          addr: "{{ ip_var }}"
+      vrf_context_ref: /api/vrfcontext?name=global
+      tenant_ref: /api/tenant/?name=admin
+      tenant: admin
+      cloud_ref: '/api/cloud/?name=Default-Cloud'
+- name: Adjust Scaleout Parameters Module05-01
+  avi_serviceenginegroup:
+      avi_api_patch_op: replace
+      avi_api_update_method: patch
+      avi_credentials: "{{ avi_credentials }}"
+      name: Default-Group
+      buffer_se: 0
+      max_scaleout_per_vs: 3
+      min_scaleout_per_vs: 3
+      max_se: 3
+      tenant_ref: /api/tenant/?name=admin
+      tenant: admin
+      cloud_ref: '/api/cloud/?name=Default-Cloud'

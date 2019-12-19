@@ -1,0 +1,85 @@
+- avi_api_session:
+    avi_credentials: "{{ avi_credentials }}"
+    tenant: "*"
+    http_method: get
+    path: virtualservice?include_name
+    params:
+        fields: name,enabled,tenant_ref,cloud_ref,se_group_ref
+  register: vs_collect
+  name: Collect VS Info Module05-07
+- avi_virtualservice:
+    avi_api_patch_op: replace
+    avi_api_update_method: patch
+    avi_credentials: "{{ avi_credentials }}"
+    tenant: "{{ vs_detail.tenant_ref | regex_replace('^.*#') }}"
+    tenant_ref: '/api/tenant?name={{ vs_detail.tenant_ref | regex_replace("^.*#") }}'
+    name: "{{ vs_detail.name }}"
+    cloud_ref: '/api/cloud?name={{ vs_detail.cloud_ref | regex_replace("^.*#") }}'
+    enabled: false
+  name: Change Status of VS Module05-07
+  loop: "{{ vs_collect['obj']['results'] }}"
+  loop_control:
+    loop_var: vs_detail
+- avi_api_session:
+    avi_credentials: "{{ avi_credentials }}"
+    tenant: "*"
+    http_method: get
+    path: serviceenginegroup-inventory
+    params:
+        fields: serviceegnines
+        name: Default-Group
+        cloud_ref.name: Default-Cloud
+  register: seg_collect
+  name: Collect SEG Info Module05-07
+- avi_api_session:
+    avi_credentials: "{{ avi_credentials }}"
+    tenant: admin
+    http_method: delete
+    path: 'serviceengine/{{ se_uuid | regex_replace("^.*serviceengine/")  }}'
+  name: SE Cleanup Module05-07
+  loop: "{{ seg_collect['obj']['results'][0]['serviceengines'] }}"
+  loop_control:
+    loop_var: se_uuid
+- avi_systemconfiguration:
+    avi_credentials: "{{ avi_credentials }}"
+    email_configuration:
+        mail_server_name: localhost
+        mail_server_port: 25
+        smtp_type: SMTP_LOCAL_HOST
+        from_email: admin@avicontroller.net
+    global_tenant_config:
+        se_in_provider_context: true
+        tenant_access_to_provider_se: true
+        tenant_vrf: false
+    dns_configuration:
+        search_domain: vclass.local
+        server_list:
+            - type: V4
+              addr: 1.1.1.1
+    docker_mode: false
+    dns_virtualservice_refs:
+        - 'https://sa-avicon-01.vclass.local/api/virtualservice/?name=sa-dns-01'
+    portal_configuration:
+        redirect_to_https: true
+        enable_https: true
+        sslkeyandcertificate_refs:
+            - 'https://sa-avicon-01.vclass.local/api/sslkeyandcertificate/?name=HOL-Site-A-Controller'
+    ntp_configuration:
+        ntp_server_list:
+            - 
+                type: V4
+                addr: 172.20.10.10
+  name: Modify Systemconfig Module05-07
+- avi_virtualservice:
+    avi_api_patch_op: replace
+    avi_api_update_method: patch
+    avi_credentials: "{{ avi_credentials }}"
+    tenant: "{{ vs_detail.tenant_ref | regex_replace('^.*#') }}"
+    tenant_ref: '/api/tenant?name={{ vs_detail.tenant_ref | regex_replace("^.*#") }}'
+    name: "{{ vs_detail.name }}"
+    cloud_ref: '/api/cloud?name={{ vs_detail.cloud_ref | regex_replace("^.*#") }}'
+    enabled: true
+  name: Change Status of VS Module05-07
+  loop: "{{ vs_collect['obj']['results'] }}"
+  loop_control:
+    loop_var: vs_detail
