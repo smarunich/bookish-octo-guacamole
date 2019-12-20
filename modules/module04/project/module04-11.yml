@@ -1,5 +1,5 @@
 avi_config:
-  vrf_context:
+  vrfcontext:
       -   cloud_ref: '/api/cloud/?name=Default-Cloud'
           vrf_ref: '/api/vrfcontext/?name=global'
           name: global
