@@ -5,7 +5,7 @@ avi_config:
           name: global
           static_routes:
               - 
-                route_id: 2
+                route_id: 1
                 prefix: 
                   mask: 0
                   ip_addr: 
